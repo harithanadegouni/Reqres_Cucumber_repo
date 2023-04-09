@@ -10,10 +10,18 @@ Feature: Reqres data management application homepage
     When I click on single user method
     Then verify response
 
-  Scenario: button validation
+  Scenario: Support Reqres button validation
     Given I open the application
     When I verify Support Reqres button is displayed
     Then Click on Support Reqres button
     And Verify Support page displayed
+
+  Scenario: Upgrade button validation
+    Given I open the application
+    When I verify Upgrade button is displayed
+    Then Click on Upgrade button
+    And Verify Upgrade details page displayed
+
+
 
 
