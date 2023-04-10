@@ -1,13 +1,9 @@
-package stepdefinitions;
-
-import cucumber.api.Scenario;
-import io.cucumber.java.After;
+package Stepdefinitions;
+import Pages.ReqresApp;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.core.api.*;
 import org.junit.Assert;
-import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -15,21 +11,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.time.Duration;
 import java.util.List;
 
 public class HomePageStepDefinitions {
     WebDriver driver;
     List<WebElement> numberOfRequests;
-    Scenario scenario;
     WebElement upgradeButton;
-
-    @Before
-    public void initializeScenario(Scenario scenario)
-    {
-        this.scenario = scenario;
-    }
+    ReqresApp pom;
+    private static final Logger logger = LogManager.getLogger(HomePageStepDefinitions.class);
 
     @Given("I open the application")
     public void i_open_the_application() {
@@ -37,8 +29,10 @@ public class HomePageStepDefinitions {
         driver = new ChromeDriver();
         driver.get("https://reqres.in/");
         driver.manage().window().maximize();
+        pom = new ReqresApp(driver);
         JavascriptExecutor js=(JavascriptExecutor) driver;
-        js.executeScript("arguments[0].scrollIntoView();",driver.findElement(By.xpath(".//div[@class='endpoints']/ul/li[1]")) );
+        js.executeScript("arguments[0].scrollIntoView();",pom.getFirstGetMethod() );
+        logger.info("I opened the application");
     }
     @When("verify different request types on homepage")
     public void verify_different_request_types_on_homepage() {
@@ -49,25 +43,24 @@ public class HomePageStepDefinitions {
             String reqType=ele.getAttribute("data-http");
             if(reqType.equalsIgnoreCase("get") || reqType.equalsIgnoreCase("post") || reqType.equalsIgnoreCase("put"))
             {
-                System.out.println("Application is displaying GET, PUT, POST,DELETE,PATCH request types");
+                logger.info("Different types of request methods exist in the application");
             }
         }
-
     }
 
     @Then("request types counts is {string}")
     public void request_types_counts_is(String count) {
         numberOfRequests=driver.findElements(By.xpath(".//div[@class='endpoints']/ul/li"));
         Assert.assertEquals(String.valueOf(numberOfRequests.size()),count);
-
+        driver.close();
     }
 
-    @When("I click on single user method")
+    @When("I click on single user request method")
     public void click_on_single_user_method() {
-        driver.findElement(By.xpath(".//div[@class='endpoints']/ul/li[2]")).click();
+        pom.getSingleUserMethod().click();
     }
 
-    @Then("verify response")
+    @Then("verify response after clicking on sigle user method")
     public void verify_response() {
         String responseCode =driver.findElement(By.cssSelector("span.response-code")).getText();
         Assert.assertEquals(responseCode,"200");
@@ -84,9 +77,13 @@ public class HomePageStepDefinitions {
                 "        \"text\": \"To keep ReqRes free, contributions towards server costs are appreciated!\"\n" +
                 "    }\n" +
                 "}";
-        String responseBody=driver.findElement(By.xpath("//pre[@data-key='output-response']")).getText();
-        System.out.println("responseBody:"+responseBody);
-        Assert.assertEquals(responseBody,actualResponse);
+
+        WebDriverWait wait =new WebDriverWait(driver, Duration.ofSeconds(40));
+        wait.until(ExpectedConditions.visibilityOf(pom.getResponseBody()));
+
+        String responseBody=pom.getResponseBody().getText();
+        Assert.assertEquals(actualResponse,responseBody);
+        driver.close();
     }
     @When("I verify Support Reqres button is displayed")
     public void verify_support_reqres_button_is_displayed() {
@@ -107,6 +104,7 @@ public class HomePageStepDefinitions {
     public void verify_support_page_displayed() {
         boolean isHeaderExist=driver.findElement(By.id("support-heading")).isDisplayed();
         Assert.assertTrue(isHeaderExist);
+        driver.close();
     }
 
     @When("I verify Upgrade button is displayed")
@@ -121,11 +119,13 @@ public class HomePageStepDefinitions {
     public void click_on_upgrade_button() {
         upgradeButton.click();
     }
+
     @Then("Verify Upgrade details page displayed")
     public void verify_upgrade_details_page_displayed() {
         boolean emailAddressTextField = driver.findElement(By.id("mce-EMAIL")).isDisplayed();
         Assert.assertTrue(emailAddressTextField);
         boolean subscribe = driver.findElement(By.id("mc-embedded-subscribe")).isDisplayed();
         Assert.assertTrue(subscribe);
+        driver.close();
     }
 }

@@ -10,10 +10,26 @@ public class ReqresApp {
 
     public ReqresApp(WebDriver driver)
     {
-        this.driver = driver
+        this.driver = driver;
         PageFactory.initElements(driver,this);
     }
 
-    @FindBy(id="elementId")
-    WebElement element;
+    @FindBy(xpath=".//div[@class='endpoints']/ul/li[1]")
+    WebElement FirstGetElement;
+
+    @FindBy(xpath=".//div[@class='endpoints']/ul/li[2]")
+    WebElement SingleUserMethod;
+
+    @FindBy(xpath="//pre[@data-key='output-response']")
+    WebElement ResponseBody;
+
+    public WebElement getFirstGetMethod(){
+        return FirstGetElement;
+    }
+    public WebElement getSingleUserMethod(){
+        return SingleUserMethod;
+    }
+    public WebElement getResponseBody(){
+        return ResponseBody;
+    }
 }

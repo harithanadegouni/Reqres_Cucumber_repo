@@ -1,7 +1,7 @@
 Setup:
 1. Create maven project
 2. Add dependencies in pom.xml
-3. Create features files, stepdefinitions as per the test case steps
+3. Create features files, Stepdefinitions as per the test case steps
 4. Create Test runner class and add correct cucumber options
 
 Run the test case:
